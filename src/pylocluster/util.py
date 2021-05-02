@@ -4,9 +4,7 @@ Utility functions for the clustering package.
 from math import sqrt
 
 
-def squareform(
-        x
-        ):
+def squareform(x):
     """
     A simplified version of the :py:func:`scipy.spatial.distance.squareform` \
     function.
@@ -26,9 +24,9 @@ def squareform(
 
     # calculate the length of the square
     s = int(sqrt(2 * l) + 1)
-    
+
     out = [[0.0 for i in range(s)] for j in range(s)]
-    
+
     k = 0
     for i in range(s):
         for j in range(s):
@@ -41,8 +39,8 @@ def squareform(
 
 def check_language_names(taxa):
     for taxon in taxa or []:
-        if [x for x in taxon if x in '():;, ']:
+        if [x for x in taxon if x in "():;, "]:
             raise ValueError(
                 "No brackets, colons, spaces, and commas allowed for doculect names"
-                )
+            )
     return taxa

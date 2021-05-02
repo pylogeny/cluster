@@ -1,5 +1,5 @@
 from pylocluster.cluster import *
-from pylocluster.util import squareform
+from pylocluster.util import squareform, check_language_names
 
 def test_flat_linkage():
     matrix = squareform([0.5, 0.67, 0.8, 0.2, 0.4, 0.7, 0.6, 0.8, 0.8, 0.3])
@@ -32,4 +32,13 @@ def test_neighbor():
     matrix = squareform([0.5, 0.67, 0.8, 0.2, 0.4, 0.7, 0.6, 0.8, 0.8, 0.3])
     taxa = ['G', 'S', 'I', 'E', 'D']
     tree = neighbor(matrix, taxa=taxa)
+
+
+def test_check_language_names():
+    try:
+        a = 1
+        check_language_names(["bla", "bl,"])
+        a = 2
+    except ValueError:
+        assert a == 1
 

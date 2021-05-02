@@ -8,12 +8,12 @@ from pylocluster.util import squareform, check_language_names
 
 
 SCORES = {
-        'upgma': mean,
-        'average': mean,
-        'single': min,
-        'complete': max,
-        'median': median
-        }
+    "upgma": mean,
+    "average": mean,
+    "single": min,
+    "complete": max,
+    "median": median,
+}
 
 
 def flat_linkage_recursive(clusters, matrix, threshold, linkage):
@@ -34,7 +34,7 @@ def flat_linkage_recursive(clusters, matrix, threshold, linkage):
         return flat_linkage_recursive(clusters, matrix, threshold, linkage)
 
 
-def flat_linkage(matrix, taxa=None, threshold=0.5, method='upgma', revert=True):
+def flat_linkage(matrix, taxa=None, threshold=0.5, method="upgma", revert=True):
     clusters = dict([(i, [i]) for i in range(len(matrix))])
     out, tree = {}, []
     flat_linkage_recursive(clusters, matrix, threshold, SCORES[method])
@@ -44,18 +44,12 @@ def flat_linkage(matrix, taxa=None, threshold=0.5, method='upgma', revert=True):
     if revert:
         for idx, key in enumerate(clusters):
             for i in clusters[key]:
-                out[i] = idx+1
+                out[i] = idx + 1
         return out
     return [set(cluster) for cluster in clusters.values()]
 
 
-def linkage_recursive(
-        clusters,
-        matrix,
-        tree,
-        branches,
-        linkage
-        ):
+def linkage_recursive(clusters, matrix, tree, branches, linkage):
     """
     Recursive base version of linkage clustering.
     """
@@ -70,10 +64,10 @@ def linkage_recursive(
         scores.append(linkage(score))
         indices.append((i, j))
     minimum = min(scores)
-    
+
     idxNew = max(clusters) + 1
     idxA, idxB = indices[scores.index(minimum)]
-    
+
     bA = minimum / 2 - branches[idxA]
     bB = minimum / 2 - branches[idxB]
 
@@ -84,54 +78,34 @@ def linkage_recursive(
     del clusters[idxB]
 
     tree.append([idxA, idxB, bA, bB])
-    
-    return linkage_recursive(
-            clusters,
-            matrix,
-            tree,
-            branches,
-            linkage
-            )
+
+    return linkage_recursive(clusters, matrix, tree, branches, linkage)
 
 
-def linkage(
-        matrix,
-        taxa=None,
-        method='upgma',
-        distances=True
-        ):
+def linkage(matrix, taxa=None, method="upgma", distances=True):
     """
     Carry out a linkage clustering analysis.
     """
-    formatter = '({0}:{2:.2f},{1}:{3:.2f})' if distances else '({0},{1})'
-    taxa = check_language_names(taxa) or ['t_'+str(i+1) for i in range(len(matrix[0]))]
+    formatter = "({0}:{2:.2f},{1}:{3:.2f})" if distances else "({0},{1})"
+    taxa = check_language_names(taxa) or [
+        "t_" + str(i + 1) for i in range(len(matrix[0]))
+    ]
     clusters = dict([(i, [i]) for i in range(len(taxa))])
     branches = dict([(i, 0) for i in range(len(taxa))])
     newick = dict([(i, taxa[i]) for i in range(len(taxa))])
     tree = []
 
     linkage_recursive(clusters, matrix, tree, branches, SCORES[method])
-    
+
     # create different output, depending on the options for the inclusion of
     # distances or topology only
-    for i,(a, b, c, d) in enumerate(tree):
-        newick[len(taxa)+i] = formatter.format(
-                newick[a],
-                newick[b],
-                c,
-                d
-                )
+    for i, (a, b, c, d) in enumerate(tree):
+        newick[len(taxa) + i] = formatter.format(newick[a], newick[b], c, d)
 
-    return newick[max(newick.keys())] + ';'
+    return newick[max(newick.keys())] + ";"
 
 
-def neighbor_recursive(
-        clusters,
-        matrix,
-        tree_matrix,
-        constant_matrix,
-        tracer
-        ):
+def neighbor_recursive(clusters, matrix, tree_matrix, constant_matrix, tracer):
     """
     Internal implementation of the neighbor-joining algorithm.
     """
@@ -139,15 +113,12 @@ def neighbor_recursive(
     if len(clusters) == 2:
         idxA, idxB = 0, 1
         idxNew = max(tracer.values()) + 1
-        tracer[tuple(clusters[idxA]+clusters[idxB])] = idxNew
+        tracer[tuple(clusters[idxA] + clusters[idxB])] = idxNew
         sAX = matrix[idxA][idxB] / 2
         sBX = matrix[idxA][idxB] / 2
         tree_matrix.append(
-                (
-                    tracer[tuple(clusters[idxA])],
-                    tracer[tuple(clusters[idxB])],
-                    sAX,
-                    sBX))
+            (tracer[tuple(clusters[idxA])], tracer[tuple(clusters[idxB])], sAX, sBX)
+        )
         # join the clusters according to the index
         clusters[idxA] += clusters[idxB]
         del clusters[idxB]
@@ -160,44 +131,39 @@ def neighbor_recursive(
     averages = []
     for line in matrix:
         averages.append(sum(line) / (N - 2.0))
-    
+
     # create the new matrix
     new_matrix = [[cell for cell in line] for line in matrix]
     for i, j in combinations(range(len(matrix)), r=2):
         new_score = matrix[i][j] - averages[i] - averages[j]
         new_matrix[i][j] = new_score
         new_matrix[j][i] = new_score
-    
+
     # determine the minimal score
     scores, indices = [], []
     for i, j in combinations(clusters.keys(), r=2):
         scores.append(new_matrix[i][j])
-        indices.append((i,j))
+        indices.append((i, j))
 
     minimum = min(scores)
     idxA, idxB = indices[scores.index(minimum)]
 
     # check for the average of the clusters
     vals = []
-    for i, j in product(clusters[idxA], clusters[idxB]): 
+    for i, j in product(clusters[idxA], clusters[idxB]):
         vals.append(constant_matrix[i][j])
     tmp_score = sum(vals) / len(vals)
-    
+
     # append the indices to the tree matrix
     sAX = matrix[idxA][idxB] / 2.0 + (averages[idxA] - averages[idxB]) / 2
     sBX = matrix[idxA][idxB] - sAX
     tree_matrix.append(
-            (
-                tracer[tuple(clusters[idxA])],
-                tracer[tuple(clusters[idxB])],
-                sAX,
-                sBX
-                )
-            )
+        (tracer[tuple(clusters[idxA])], tracer[tuple(clusters[idxB])], sAX, sBX)
+    )
 
     # create the new index for the tracer
     idxNew = max(tracer.values()) + 1
-    tracer[tuple(clusters[idxA]+clusters[idxB])] = idxNew
+    tracer[tuple(clusters[idxA] + clusters[idxB])] = idxNew
 
     clusters[idxA] += clusters[idxB]
     del clusters[idxB]
@@ -219,7 +185,7 @@ def neighbor_recursive(
             dist_a = matrix[idxA][a]
             dist_b = matrix[idxB][a]
             new_matrix.append(((dist_a + dist_b) - dist_ab) / 2.0)
-    
+
     # get values of new_clusters into clusters
     clusters = {}
     for key, val in new_clusters.items():
@@ -227,49 +193,36 @@ def neighbor_recursive(
 
     # return score
     return neighbor_recursive(
-            clusters,
-            squareform(new_matrix),
-            tree_matrix,
-            constant_matrix,
-            tracer
-            )
+        clusters, squareform(new_matrix), tree_matrix, constant_matrix, tracer
+    )
 
 
-def neighbor(
-        matrix,
-        taxa=None,
-        distances=True
-        ):
+def neighbor(matrix, taxa=None, distances=True):
     """
     Function clusters data according to the Neighbor-Joining algorithm \
     (:evobib:`Saitou1987`).
     """
-    clusters = dict([(i,[i]) for i in range(len(taxa))])
-    formatter = '({0}:{2:.2f},{1}:{3:.2f})' if distances else '({0},{1})'
-    taxa = check_language_names(taxa) or ['t_'+str(i+1) for i in range(len(matrix[0]))]
+    clusters = dict([(i, [i]) for i in range(len(taxa))])
+    formatter = "({0}:{2:.2f},{1}:{3:.2f})" if distances else "({0},{1})"
+    taxa = check_language_names(taxa) or [
+        "t_" + str(i + 1) for i in range(len(matrix[0]))
+    ]
     tracer = dict([(tuple([a]), b[0]) for (a, b) in clusters.items()])
     newick = dict([(i, taxa[i]) for i in range(len(matrix[0]))])
 
     tree = []
 
     neighbor_recursive(
-            clusters, 
-            matrix, 
-            tree, 
-            [[c for c in l] for l in matrix], 
-            dict([(tuple([a]), b[0]) for (a, b) in clusters.items()])
-            )
+        clusters,
+        matrix,
+        tree,
+        [[c for c in l] for l in matrix],
+        dict([(tuple([a]), b[0]) for (a, b) in clusters.items()]),
+    )
 
-        
     # create different output, depending on the options for the inclusion of
     # distances or topology only
     for i, (a, b, c, d) in enumerate(tree):
-        newick[len(taxa)+i] = formatter.format(
-                newick[a],
-                newick[b],
-                c,
-                d
-                )    
-    newick_string = newick[max(newick.keys())] + ';'
-    return newick_string    
-    
+        newick[len(taxa) + i] = formatter.format(newick[a], newick[b], c, d)
+    newick_string = newick[max(newick.keys())] + ";"
+    return newick_string
