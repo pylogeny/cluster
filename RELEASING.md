@@ -44,7 +44,7 @@ Releasing pylocluster
 
 - Change version for the next release cycle, i.e. incrementing and adding .dev0
   - `setup.py`
-  - `src/linse/__init__.py`
+  - `src/pylocluster/__init__.py`
 
 - Commit/push the version change:
   ```shell script

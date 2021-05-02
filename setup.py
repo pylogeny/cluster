@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pylocluster',
-    version='0.1.0',
+    version='0.2.0.dev0',
     license='Apache 2.0',
     description='Distance-based cluster methods for linguistic phylogenies',
     long_description=open('README.md').read(),
