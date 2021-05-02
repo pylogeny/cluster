@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pylocluster',
-    version='0.1.0.dev0',
+    version='0.1.0',
     license='Apache 2.0',
     description='Distance-based cluster methods for linguistic phylogenies',
     long_description=open('README.md').read(),
@@ -17,8 +17,8 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     author='Johann-Mattis List',
-    author_email='list@shh.mpg.de',
-    url='https://github.com/pylogeny/pylocluster',
+    author_email='mattis_list@eva.mpg.de',
+    url='https://github.com/pylogeny/cluster',
     keywords='data',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
@@ -28,10 +28,9 @@ setup(
     python_requires='>=3.5',
     install_requires=[],
     extras_require={
-        'dev': ['flake8', 'wheel', 'twine'],
+        'dev': ['black', 'wheel', 'twine'],
         'test': [
             'pytest>=4.3',
-            'pytest-mock',
             'pytest-cov',
             'coverage>=4.2',
         ],
