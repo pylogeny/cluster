@@ -1,6 +1,6 @@
 # PyloCluster 
 
-[![codecov](https://codecov.io/gh/lingpy/linse/branch/master/graph/badge.svg)](https://codecov.io/gh/pylogeny/cluster)
+[![codecov](https://codecov.io/gh/pylogeny/cluster/branch/master/graph/badge.svg)](https://codecov.io/gh/pylogeny/cluster)
 [![PyPI](https://img.shields.io/pypi/v/pylocluster.svg)](https://pypi.org/project/pylocluster)
 
 PyloCluster provides basic functionalities for distance-based clustering procedures in Python, including implementations of the Neighbor-joining and the UPGMA algorithm for phylogenetic reconstruction.
