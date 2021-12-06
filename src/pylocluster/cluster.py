@@ -86,7 +86,7 @@ def linkage(matrix, taxa=None, method="upgma", distances=True):
     """
     Carry out a linkage clustering analysis.
     """
-    formatter = "({0}:{2:.2f},{1}:{3:.2f})" if distances else "({0},{1})"
+    formatter = "({0}:{2:.4f},{1}:{3:.4f})" if distances else "({0},{1})"
     taxa = check_language_names(taxa) or [
         "t_" + str(i + 1) for i in range(len(matrix[0]))
     ]
@@ -203,7 +203,7 @@ def neighbor(matrix, taxa=None, distances=True):
     (:evobib:`Saitou1987`).
     """
     clusters = dict([(i, [i]) for i in range(len(taxa))])
-    formatter = "({0}:{2:.2f},{1}:{3:.2f})" if distances else "({0},{1})"
+    formatter = "({0}:{2:.4f},{1}:{3:.4f})" if distances else "({0},{1})"
     taxa = check_language_names(taxa) or [
         "t_" + str(i + 1) for i in range(len(matrix[0]))
     ]
@@ -226,3 +226,4 @@ def neighbor(matrix, taxa=None, distances=True):
         newick[len(taxa) + i] = formatter.format(newick[a], newick[b], c, d)
     newick_string = newick[max(newick.keys())] + ";"
     return newick_string
+
